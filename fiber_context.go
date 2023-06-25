@@ -14,6 +14,24 @@ type FiberContext struct {
 	request  http.Request
 }
 
+func (c *FiberContext) Trans(key string, args ...interface{}) string {
+	if len(args) == 2 {
+		return TranslationFacade.Language(args[1].(string)).Get(key, args[0])
+	}
+	return TranslationFacade.Language(c.GetLocale()).Get(key, args...)
+}
+
+func (c *FiberContext) GetLocale() string {
+	if c.Value("locale") == nil {
+		return TranslationFacade.GetDefaultLocale()
+	}
+	return c.Value("locale").(string)
+}
+
+func (c *FiberContext) SetLocale(locale string) {
+	c.WithValue("locale", locale)
+}
+
 func NewFiberContext(ctx *fiber.Ctx) http.Context {
 	return &FiberContext{instance: ctx}
 }
@@ -38,6 +56,8 @@ func (c *FiberContext) Response() http.Response {
 func (c *FiberContext) WithValue(key string, value any) {
 	ctx := c.instance.UserContext()
 	ctx = context.WithValue(ctx, key, value)
+
+	c.instance.SetUserContext(ctx)
 }
 
 func (c *FiberContext) Context() context.Context {

@@ -28,6 +28,28 @@ type FiberRequest struct {
 	validation validatecontract.Validation
 }
 
+func (r *FiberRequest) ExpectsJson() bool {
+	return r.Ajax() || r.WantsJson()
+}
+
+func (r *FiberRequest) WantsJson() bool {
+	accept := r.instance.Get("Accept")
+	return strings.Contains(accept, "application/json") || strings.Contains(accept, "text/json")
+}
+
+func (r *FiberRequest) Ajax() bool {
+	return r.instance.Get("X-Requested-With") == "XMLHttpRequest"
+}
+
+func (r *FiberRequest) Pjax() bool {
+	return r.instance.Get("X-PJAX") == "true"
+}
+
+func (r *FiberRequest) AbortWithError(err error) {
+	handleException(r.ctx, err)
+	r.instance.Send(nil)
+}
+
 func NewFiberRequest(ctx *FiberContext, log log.Log, validation validatecontract.Validation) httpcontract.Request {
 	postData, err := getPostData(ctx)
 	if err != nil {

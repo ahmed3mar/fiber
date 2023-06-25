@@ -79,3 +79,8 @@ func runningInConsole() bool {
 
 	return len(args) >= 2 && args[1] == "artisan"
 }
+
+func handleException(ctx *FiberContext, err error) {
+	ExceptionFacade.Report(err)
+	ExceptionFacade.Render(ctx, err)
+}

@@ -15,6 +15,36 @@ type FiberResponse struct {
 	origin   httpcontract.ResponseOrigin
 }
 
+func (r *FiberResponse) Status(code int) httpcontract.ResponseStatus {
+	return NewFibertatus(r.instance, code)
+}
+
+type FiberStatus struct {
+	instance *fiber.Ctx
+	status   int
+}
+
+func NewFibertatus(instance *fiber.Ctx, code int) httpcontract.ResponseSuccess {
+	return &FiberStatus{instance, code}
+}
+
+func (r *FiberStatus) Data(contentType string, data []byte) {
+	_ = r.instance.Status(r.status).Type(contentType).Send(data)
+}
+
+func (r *FiberStatus) Json(obj any) {
+	r.instance.Status(r.status).JSON(obj)
+}
+
+func (r *FiberStatus) String(format string, values ...any) {
+	if len(values) == 0 {
+		_ = r.instance.Status(r.status).Type(format).SendString(format)
+		return
+	}
+
+	_ = r.instance.Status(r.status).Type(format).SendString(values[0].(string))
+}
+
 func NewFiberResponse(instance *fiber.Ctx, origin httpcontract.ResponseOrigin) *FiberResponse {
 	return &FiberResponse{instance, origin}
 }

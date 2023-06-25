@@ -26,7 +26,13 @@ type FiberRoute struct {
 // NewFiberRoute create new fiber route instance
 // NewFiberRoute 创建新的光纤路由实例
 func NewFiberRoute(config config.Config) *FiberRoute {
+	var views fiber.Views
+	if config.Get("http.drivers.fiber.views") != nil {
+		views = config.Get("http.drivers.fiber.views").(fiber.Views)
+	}
+
 	app := fiber.New(fiber.Config{
+		Views:              views,
 		EnableIPValidation: true,
 		EnablePrintRoutes:  true,
 		StreamRequestBody:  true,

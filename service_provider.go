@@ -2,6 +2,8 @@ package fiber
 
 import (
 	"github.com/gofiber/fiber/v2"
+	"github.com/goravel/framework/contracts/exception"
+	"github.com/goravel/framework/contracts/translation"
 
 	"github.com/goravel/framework/contracts/cache"
 	"github.com/goravel/framework/contracts/config"
@@ -22,6 +24,8 @@ var (
 	LogFacade         log.Log
 	RateLimiterFacade http.RateLimiter
 	ValidationFacade  validation.Validation
+	TranslationFacade translation.Translation
+	ExceptionFacade   exception.Exception
 )
 
 type ServiceProvider struct {
@@ -43,4 +47,6 @@ func (receiver *ServiceProvider) Boot(app foundation.Application) {
 	CacheFacade = app.MakeCache()
 	LogFacade = app.MakeLog()
 	ValidationFacade = app.MakeValidation()
+	TranslationFacade = app.MakeTranslation()
+	ExceptionFacade = app.MakeException()
 }
