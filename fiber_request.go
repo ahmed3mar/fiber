@@ -47,7 +47,7 @@ func (r *FiberRequest) Pjax() bool {
 
 func (r *FiberRequest) AbortWithError(err error) {
 	handleException(r.ctx, err)
-	r.instance.Send(nil)
+	//r.instance.Send(nil)
 }
 
 func NewFiberRequest(ctx *FiberContext, log log.Log, validation validatecontract.Validation) httpcontract.Request {
@@ -162,8 +162,8 @@ func (r *FiberRequest) Method() string {
 	return r.instance.Method()
 }
 
-func (r *FiberRequest) Next() {
-	_ = r.instance.Next()
+func (r *FiberRequest) Next() error {
+	return r.instance.Next()
 }
 
 func (r *FiberRequest) Query(key string, defaultValue ...string) string {
@@ -224,8 +224,12 @@ func (r *FiberRequest) Queries() map[string]string {
 }
 
 func (r *FiberRequest) Origin() *http.Request {
-	// Fiber does not support http.Request
-	return nil
+	req := &http.Request{}
+	err := ConvertRequest(r.instance.Context(), req, false)
+	if err != nil {
+		return nil
+	}
+	return req
 }
 
 func (r *FiberRequest) Path() string {

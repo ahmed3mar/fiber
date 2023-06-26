@@ -7,7 +7,7 @@ import (
 
 	"github.com/bytedance/sonic"
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/recover"
+	fiberlogger "github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gookit/color"
 
 	"github.com/goravel/framework/contracts/config"
@@ -40,7 +40,9 @@ func NewFiberRoute(config config.Config) *FiberRoute {
 		JSONEncoder:        sonic.Marshal,
 		JSONDecoder:        sonic.Unmarshal,
 	})
-	app.Use(recover.New())
+
+	app.Use(fiberlogger.New())
+
 	return &FiberRoute{
 		config:   config,
 		instance: app,
@@ -57,7 +59,7 @@ func (r *FiberRoute) Fallback(handler httpcontract.HandlerFunc) {
 // GlobalMiddleware 设置全局中间件
 func (r *FiberRoute) GlobalMiddleware(middlewares ...httpcontract.Middleware) {
 	if len(middlewares) > 0 {
-		r.instance.Use(middlewaresToFiberHandlers(middlewares)...)
+		r.instance.Use(middlewaresToFiberAny(middlewares)...)
 	}
 	r.Route = NewFiberGroup(
 		r.instance,

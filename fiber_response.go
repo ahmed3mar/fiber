@@ -123,7 +123,7 @@ func (r *FiberSuccess) String(format string, values ...any) {
 }
 
 func FiberResponseMiddleware() httpcontract.Middleware {
-	return func(ctx httpcontract.Context) {
+	return func(ctx httpcontract.Context) error {
 		blw := &BodyWriter{body: bytes.NewBufferString("")}
 		switch ctx := ctx.(type) {
 		case *FiberContext:
@@ -132,7 +132,7 @@ func FiberResponseMiddleware() httpcontract.Middleware {
 		}
 
 		ctx.WithValue("responseOrigin", blw)
-		ctx.Request().Next()
+		return ctx.Request().Next()
 	}
 }
 
