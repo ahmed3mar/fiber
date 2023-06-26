@@ -36,6 +36,7 @@ func NewFiberRoute(config config.Config) *FiberRoute {
 		EnableIPValidation: true,
 		EnablePrintRoutes:  true,
 		StreamRequestBody:  true,
+		PassLocalsToViews:  true,
 		ServerHeader:       "Goravel",
 		JSONEncoder:        sonic.Marshal,
 		JSONDecoder:        sonic.Unmarshal,
@@ -46,6 +47,12 @@ func NewFiberRoute(config config.Config) *FiberRoute {
 	return &FiberRoute{
 		config:   config,
 		instance: app,
+		Route: NewFiberGroup(
+			app,
+			"",
+			[]httpcontract.Middleware{},
+			[]httpcontract.Middleware{FiberResponseMiddleware()},
+		),
 	}
 }
 
